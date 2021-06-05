@@ -1,3 +1,7 @@
+import pandas as pd
+from sqlalchemy import create_engine
+engine = create_engine('sqlite:///database.db3')
+
 df= pd.read_csv("Downloads/archivo prueba data engineer trainee/clientes.csv",  sep=";")
 df= df.drop(["altura","peso"], axis=1)
 
@@ -17,17 +21,25 @@ clientes[["fiscal_id","first_name","last_name","gender","birth_date","age","age_
 clientes[["fiscal_id", "first_name","last_name","gender","address"]] = 
   clientes[["fiscal_id", "first_name","last_name","gender","address"]].apply(lambda x: x.astype(str).str.upper())
 clientes["age_group"] = clientes["age_group"].astype("int64")
-clientes.to_excel
+writer = pd.ExcelWriter('emails.xlsx', engine='xlsxwriter')
+df.to_excel(writer)
+writer.save()
+clientes.to_sql("clientes",con=engine)
 
 emails = pd.DataFrame()
 emails [["fiscal_id","email","status","priority"]] = df[["fiscal_id","correo","estatus_contacto","prioridad"]]
 emails [["fiscal_id","email","status"]] = df[["fiscal_id","correo","estatus_contacto"]].apply(lambda x: x.astype(str).str.upper())
 emails ["priority"] = df["prioridad"].fillna(0).astype("int64")
-emails.to_excel
+df.to_excel(writer)
+writer.save()
+emails.to_sql("emails",con=engine)
+
 
 phones = pd.DataFrame()
 phones [["fiscal_id","phone","status","priority"]] = df[["fiscal_id","telefono","estatus_contacto","prioridad"]]
 phones [["fiscal_id","status"]] = df[["fiscal_id","estatus_contacto"]].apply(lambda x: x.astype(str).str.upper())
 phones ["phone"] = df["telefono"].fillna(0).astype("int64").astype("string")
 phones ["priority"] = df["prioridad"].fillna(0).astype("int64")
-phones.to_excel
+df.to_excel(writer)
+writer.save()
+phones.to_sql("phones",con=engine)
